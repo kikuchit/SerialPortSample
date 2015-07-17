@@ -1,0 +1,6 @@
+c:\users\bizsys\documents\visual studio 2013\Projects\SerialPortSample\SerialPortSample\bin\Debug\SerialPortSample.exe.config
+C:\Users\bizsys\Documents\Visual Studio 2013\Projects\SerialPortSample\SerialPortSample\bin\Debug\SerialPortSample.exe
+C:\Users\bizsys\Documents\Visual Studio 2013\Projects\SerialPortSample\SerialPortSample\bin\Debug\SerialPortSample.pdb
+C:\Users\bizsys\Documents\Visual Studio 2013\Projects\SerialPortSample\SerialPortSample\obj\Debug\SerialPortSample.csprojResolveAssemblyReference.cache
+C:\Users\bizsys\Documents\Visual Studio 2013\Projects\SerialPortSample\SerialPortSample\obj\Debug\SerialPortSample.exe
+C:\Users\bizsys\Documents\Visual Studio 2013\Projects\SerialPortSample\SerialPortSample\obj\Debug\SerialPortSample.pdb
