@@ -8,12 +8,8 @@ namespace SerialPortSample
         private OperationFactory() { }
 
         public static Operation MakeOperation(byte[] data) {
-            if (data[0] != 0x02) {
-                throw new ArgumentException();
-            }
-
             Operation op = null;
-            switch (data[1]) {
+            switch (data[0]) {
                 case 0x42:
                     op = new Clear();
                     break;
@@ -43,7 +39,7 @@ namespace SerialPortSample
         }
 
         public override void Make(byte[] data) {
-            this.OperationCode = Encoding.ASCII.GetString(data, 1, 1);
+            this.OperationCode = Encoding.ASCII.GetString(data, 0, 1);
         }
 
         public override string ToString() {
@@ -73,11 +69,11 @@ namespace SerialPortSample
 
         public override void Make(byte[] data)
         {
-            this.Trial = Encoding.ASCII.GetString(data, 2, 1);
-            this.Number = Encoding.ASCII.GetString(data, 3, 4);
-            this.RecordIntegerPart = Encoding.ASCII.GetString(data, 7, 2);
-            this.RecordDecimalPart = Encoding.ASCII.GetString(data, 9, 2);
-            this.Result = Encoding.ASCII.GetString(data, 11, 1);
+            this.Trial = Encoding.ASCII.GetString(data, 1, 1);
+            this.Number = Encoding.ASCII.GetString(data, 2, 4);
+            this.RecordIntegerPart = Encoding.ASCII.GetString(data, 6, 2);
+            this.RecordDecimalPart = Encoding.ASCII.GetString(data, 8, 2);
+            this.Result = Encoding.ASCII.GetString(data, 10, 1);
         }
 
         public override string ToString()

@@ -13,67 +13,82 @@ namespace SerialPortSample
             public const byte Etx = 0x03;
         }
 
-        byte[] buf = new byte[1024];
-        int readByte = 0;
-        bool isReading = false;
+        public delegate void ExecuteCommand(byte[] data, int endPos);
+
+        byte[] buf;
+        int readByte;
+        bool isReading;
+        SerialPort port;
+        ExecuteCommand executeCommand;
+
+        public SerialPortControl(ExecuteCommand command)
+        {
+            this.buf = new byte[1024];
+            this.readByte = 0;
+            this.isReading = false;
+            this.port = new SerialPort("COM5", 2400, Parity.Even, 8, StopBits.Two);
+            this.port.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
+            this.executeCommand = new ExecuteCommand(command);
+        }
 
         public void Run()
         {
-            SerialPort port = new SerialPort("COM5", 2400, Parity.Even, 8, StopBits.Two);
-            port.DataReceived += new SerialDataReceivedEventHandler(SerialPort_DataReceived);
             try
             {
-                port.Open();
-                port.DtrEnable = true;
-                port.RtsEnable = true;
+                this.port.Open();
+                this.port.DtrEnable = true;
+                this.port.RtsEnable = true;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
             Console.ReadLine();
-            port.Close();
-            port.Dispose();
+            this.port.Close();
+            this.port.Dispose();
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialPort port = (SerialPort)sender;
-            while (true)
+            while (this.port.BytesToRead != 0)
             {
-                if (port.BytesToRead == 0)
-                {
-                    break;
-                }
-
-                byte b = (byte)port.ReadByte();
-                if (isReading)
+                byte b = (byte)this.port.ReadByte();
+                if (this.isReading)
                 {
                     if (b == SerialCode.Etx)
                     {
-                        ExecuteCommand(buf, readByte);
-                        readByte = 0;
-                        isReading = false;
+                        this.executeCommand(buf, this.readByte);
+                        this.Initialize();
                         continue;
                     }
 
-                    buf[readByte] = b;
-                    readByte++;
+                    this.Append(b);
                     continue;
                 }
 
                 if (b == SerialCode.Stx)
                 {
-                    isReading = true;
+                    this.isReading = true;
                     continue;
                 }
             }
         }
 
-        private void ExecuteCommand(byte[] data, int endPos)
+        private void Append(byte b)
         {
-            string message = Encoding.ASCII.GetString(data, 0, endPos);
-            Console.WriteLine(message);
+            if (this.readByte + 1 > this.buf.Length)
+            {
+                throw new IndexOutOfRangeException("読み込みバッファ超過");
+            }
+            this.buf[this.readByte] = b;
+            this.readByte++;
+        }
+
+        private void Initialize()
+        {
+            Array.Clear(this.buf, 0, this.buf.Length);
+            this.readByte = 0;
+            this.isReading = false;
         }
     }
 }
